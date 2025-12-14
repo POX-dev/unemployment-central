@@ -1,8 +1,9 @@
 importScripts("https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.all.js");
-
 const { ScramjetServiceWorker } = $scramjetLoadWorker();
-
-const scramjet = new ScramjetServiceWorker();
+const scramjet = new ScramjetServiceWorker({
+  prefix: "/scramjet/",
+  codec: "xor"
+});
 
 async function handleRequest(event) {
   await scramjet.loadConfig();
