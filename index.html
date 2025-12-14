@@ -129,7 +129,7 @@
 				</div>
 
 				<script src="main.js"></script>
-				<script src="tinyjet/scramjet.all.js" defer>
+				<script src="scramjet/scramjet.all.js" defer>
 				</script>
 				<script type="module" defer>
 					import * as BareMux from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux/dist/index.mjs";
@@ -137,9 +137,9 @@
     const scramjet = new ScramjetController({ 
       prefix: "/scramjet/",
       files: { 
-        wasm: "tinyjet/wasm.wasm", 
-        all: "tinyjet/scramjet.all.js", 
-        sync: "tinyjet/scramjet.sync.js" 
+        wasm: "scramjet/wasm.wasm", 
+        all: "scramjet/scramjet.all.js", 
+        sync: "scramjet/scramjet.sync.js" 
       } 
     });
     

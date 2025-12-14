@@ -1,4 +1,4 @@
-importScripts("https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.all.js");
+importScripts("scramjet/scramjet.all.js");
 const { ScramjetServiceWorker } = $scramjetLoadWorker();
 const scramjet = new ScramjetServiceWorker({
   prefix: "/scramjet/",
