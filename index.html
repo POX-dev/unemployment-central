@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Unemployment Central</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Pacifico&display=swap"
+		rel="stylesheet">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: #0f0f0f;
+			min-height: 100vh;
+			overflow-y: auto;
+			position: relative;
+		}
+
+		.constellation-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 0;
+			pointer-events: none;
+		}
+
+		.star {
+			position: absolute;
+			width: 2px;
+			height: 2px;
+			background: rgba(255, 255, 255, 0.6);
+			border-radius: 50%;
+			animation: twinkle 3s infinite;
+		}
+
+		@keyframes twinkle {
+
+			0%,
+			100% {
+				opacity: 0.3;
+			}
+
+			50% {
+				opacity: 1;
+			}
+		}
+
+		.constellation-line {
+			position: absolute;
+			height: 1px;
+			background: linear-gradient(90deg,
+					rgba(255, 107, 53, 0.2),
+					rgba(255, 215, 0, 0.3),
+					rgba(255, 107, 53, 0.2));
+			transform-origin: left center;
+			animation: pulse 4s infinite;
+		}
+
+		@keyframes pulse {
+
+			0%,
+			100% {
+				opacity: 0.2;
+			}
+
+			50% {
+				opacity: 0.6;
+			}
+		}
+
+		.container {
+			position: relative;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 30px 20px;
+			z-index: 1;
+		}
+
+		.logo {
+			font-size: 48px;
+			font-weight: 400;
+			font-style: normal;
+			color: #ffffff;
+			margin-bottom: 30px;
+			letter-spacing: 1px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-family: 'Pacifico', cursive;
+		}
+
+		.logo-icon {
+			font-size: 36px;
+			color: #ff6b35;
+			animation: electricPulse 2s infinite;
+		}
+
+		@keyframes electricPulse {
+
+			0%,
+			100% {
+				opacity: 0.6;
+				text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+			}
+
+			50% {
+				opacity: 1;
+				text-shadow: 0 0 20px rgba(255, 107, 53, 0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+			}
+		}
+
+		.search-wrapper {
+			width: 100%;
+			max-width: 650px;
+			margin-bottom: 25px;
+			position: relative;
+		}
+
+		.search-box {
+			width: 100%;
+			position: relative;
+		}
+
+		.search-box::before {
+			content: '';
+			position: absolute;
+			top: -2px;
+			left: -2px;
+			right: -2px;
+			bottom: -2px;
+			background: linear-gradient(90deg,
+					#ff6b35,
+					#f7931e,
+					#ffd700,
+					#ff6b35);
+			border-radius: 14px;
+			z-index: -1;
+			background-size: 300% 100%;
+			animation: flow 4s linear infinite;
+		}
+
+		@keyframes flow {
+			0% {
+				background-position: 0% 0;
+			}
+
+			100% {
+				background-position: 300% 0;
+			}
+		}
+
+		.search-input-wrapper {
+			position: relative;
+			display: flex;
+			align-items: center;
+		}
+
+		.search-icon {
+			position: absolute;
+			left: 20px;
+			color: rgba(255, 255, 255, 0.4);
+			font-size: 18px;
+			pointer-events: none;
+		}
+
+		.search-input {
+			width: 100%;
+			padding: 16px 24px 16px 52px;
+			background: #1a1a1a;
+			border: none;
+			border-radius: 12px;
+			color: #ffffff;
+			font-size: 15px;
+			font-family: 'Inter', sans-serif;
+			outline: none;
+			transition: all 0.3s ease;
+			position: relative;
+			z-index: 1;
+		}
+
+		.search-input::placeholder {
+			color: rgba(255, 255, 255, 0.35);
+		}
+
+		.settings-link {
+			color: rgba(255, 255, 255, 0.5);
+			font-size: 13px;
+			margin-bottom: 50px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			letter-spacing: 0.5px;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			justify-content: center;
+		}
+
+		.settings-link:hover {
+			color: #ff6b35;
+		}
+
+		.random-message {
+			color: #ff6b35;
+			font-size: 16px;
+			font-style: italic;
+			margin-bottom: 25px;
+			margin-top: 10px;
+			text-align: center;
+			letter-spacing: 0.5px;
+			font-family: 'Inter', sans-serif;
+			font-weight: 500;
+			display: block;
+			width: 100%;
+			max-width: 650px;
+		}
+
+		.quick-apps {
+			display: grid;
+			grid-template-columns: repeat(4, 90px);
+			gap: 20px;
+			margin-top: 10px;
+			justify-content: center;
+		}
+
+		@media (max-width: 600px) {
+			.quick-apps {
+				grid-template-columns: repeat(4, 75px);
+				gap: 14px;
+			}
+		}
+
+		.app-button {
+			width: 90px;
+			height: 90px;
+			background: rgba(255, 255, 255, 0.03);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			border-radius: 20px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			color: rgba(255, 255, 255, 0.8);
+			font-size: 11px;
+			font-weight: 400;
+			backdrop-filter: blur(10px);
+			padding: 10px;
+		}
+
+		@media (max-width: 600px) {
+			.app-button {
+				width: 75px;
+				height: 75px;
+				font-size: 10px;
+				padding: 8px;
+			}
+		}
+
+		.app-button:hover {
+			background: rgba(255, 107, 53, 0.1);
+			border-color: rgba(255, 107, 53, 0.3);
+			transform: translateY(-4px);
+			box-shadow: 0 8px 24px rgba(255, 107, 53, 0.2);
+		}
+
+		.app-icon {
+			width: 38px;
+			height: 38px;
+			margin-bottom: 8px;
+			border-radius: 11px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 22px;
+		}
+
+		@media (max-width: 600px) {
+			.app-icon {
+				width: 32px;
+				height: 32px;
+				font-size: 18px;
+				margin-bottom: 6px;
+			}
+		}
+
+		.iframe-wrapper {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: #0a0a0a;
+			z-index: 1000;
+			display: none;
+		}
+
+		.iframe-wrapper.active {
+			display: block;
+		}
+
+		#iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
+		}
+
+		.settings-modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.85);
+			backdrop-filter: blur(10px);
+			z-index: 2000;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+		}
+
+		.settings-modal.active {
+			display: flex;
+		}
+
+		.settings-content {
+			background: #1a1a1a;
+			border: 1px solid rgba(255, 107, 53, 0.3);
+			border-radius: 20px;
+			padding: 40px;
+			max-width: 500px;
+			width: 100%;
+			position: relative;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+		}
+
+		.settings-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 30px;
+		}
+
+		.settings-title {
+			font-size: 24px;
+			font-weight: 500;
+			color: #ffffff;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.close-btn {
+			background: none;
+			border: none;
+			color: rgba(255, 255, 255, 0.5);
+			font-size: 24px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			padding: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.close-btn:hover {
+			color: #ff6b35;
+			transform: rotate(90deg);
+		}
+
+		.setting-group {
+			margin-bottom: 25px;
+		}
+
+		.setting-label {
+			color: rgba(255, 255, 255, 0.7);
+			font-size: 13px;
+			margin-bottom: 10px;
+			display: block;
+			font-weight: 500;
+			letter-spacing: 0.5px;
+		}
+
+		.setting-input {
+			width: 100%;
+			padding: 14px 18px;
+			background: #0f0f0f;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 10px;
+			color: #ffffff;
+			font-size: 14px;
+			font-family: 'Inter', sans-serif;
+			outline: none;
+			transition: all 0.3s ease;
+		}
+
+		.setting-input:focus {
+			border-color: rgba(255, 107, 53, 0.5);
+			background: #121212;
+		}
+
+		.setting-input::placeholder {
+			color: rgba(255, 255, 255, 0.3);
+		}
+
+		.save-btn {
+			width: 100%;
+			padding: 14px;
+			background: linear-gradient(90deg, #ff6b35, #f7931e);
+			border: none;
+			border-radius: 10px;
+			color: #ffffff;
+			font-size: 14px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			margin-top: 10px;
+		}
+
+		.save-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+		}
+
+		.about-blank-btn {
+			width: 100%;
+			padding: 14px;
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 10px;
+			color: rgba(255, 255, 255, 0.8);
+			font-size: 14px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			margin-top: 10px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+		}
+
+		.about-blank-btn:hover {
+			background: rgba(255, 255, 255, 0.08);
+			border-color: rgba(255, 107, 53, 0.3);
+			color: #ff6b35;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="constellation-bg" id="constellation"></div>
+
+	<div class="container" id="homepage">
+		<div class="logo">
+			<i class="bi bi-lightning-charge-fill logo-icon"></i>
+			<span>unemployment central</span>
+		</div>
+
+		<div class="search-wrapper">
+			<form id="search" class="search-box">
+				<div class="search-input-wrapper">
+					<i class="bi bi-search search-icon"></i>
+					<input id="url" type="text" class="search-input" placeholder="Search or enter a site URL">
+        </div>
+			</form>
+		</div>
+
+		<div class="settings-link" onclick="openSettings()">
+			<i class="bi bi-gear"></i>
+			<span>Settings</span>
+		</div>
+
+		<div class="random-message" id="randomMessage">go get a life</div>
+
+		<div class="quick-apps">
+			<a href="#" class="app-button" onclick="loadUrl('https://youtube.com'); return false;">
+				<div class="app-icon" style="background: #FF0000; color: white;">
+					<i class="bi bi-play-fill"></i>
+				</div>
+				<div>YouTube</div>
+			</a>
+			<a href="#" class="app-button" onclick="loadUrl('https://github.com'); return false;">
+				<div class="app-icon" style="background: #24292e; color: white;">
+					<i class="bi bi-github"></i>
+				</div>
+				<div>GitHub</div>
+			</a>
+			<a href="#" class="app-button" onclick="loadUrl('https://discord.com'); return false;">
+				<div class="app-icon" style="background: #5865F2; color: white;">
+					<i class="bi bi-discord"></i>
+				</div>
+				<div>Discord</div>
+			</a>
+			<a href="#" class="app-button" onclick="loadUrl('https://tiktok.com'); return false;">
+				<div class="app-icon" style="background: linear-gradient(45deg, #00f2ea, #ff0050); color: white;">
+					<i class="bi bi-music-note-beamed"></i>
+				</div>
+				<div>TikTok</div>
+			</a>
+			<a href="#" class="app-button" onclick="loadUrl('https://google.com'); return false;">
+				<div class="app-icon" style="background: linear-gradient(45deg, #4285F4, #EA4335); color: white;">
+					<i class="bi bi-google"></i>
+				</div>
+				<div>Google</div>
+			</a>
+			<a href="#" class="app-button" onclick="loadUrl('https://x.com'); return false;">
+				<div class="app-icon" style="background: #000000; color: white;">
+					<i class="bi bi-twitter-x"></i>
+				</div>
+				<div>Twitter/X</div>
+			</a>
+			<a href="#" class="app-button" onclick="loadUrl('https://roblox.com'); return false;">
+				<div class="app-icon" style="background: #000000; color: white;">
+					<i class="bi bi-controller"></i>
+				</div>
+				<div>Games</div>
+			</a>
+			<a href="#" class="app-button" onclick="loadUrl('https://nvidia.com/geforce-now'); return false;">
+				<div class="app-icon" style="background: #76B900; color: white;">
+					<i class="bi bi-lightning-charge-fill"></i>
+				</div>
+				<div>GeForce Now</div>
+			</a>
+		</div>
+	</div>
+
+	<div class="settings-modal" id="settingsModal">
+		<div class="settings-content">
+			<div class="settings-header">
+				<div class="settings-title">
+					<i class="bi bi-gear-fill"></i>
+					Settings
+				</div>
+				<button class="close-btn" onclick="closeSettings()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+			</div>
+
+			<div class="setting-group">
+				<label class="setting-label">WISP Server URL</label>
+				<input id="websocket" type="text" class="setting-input" placeholder="wss://gointospace.app/wisp/" value="wss://gointospace.app/wisp/">
+      </div>
+
+				<div class="setting-group">
+					<label class="setting-label">Tab Title (Cloaking)</label>
+					<input id="tabTitle" type="text" class="setting-input" placeholder="Google">
+      </div>
+
+					<div class="setting-group">
+						<label class="setting-label">Panic Key (Press to quick exit)</label>
+						<input id="panicKey" type="text" class="setting-input" placeholder="Press a key..." readonly>
+      </div>
+
+						<button class="save-btn" onclick="saveSettings()">Save Settings</button>
+
+						<button class="about-blank-btn" onclick="openInAboutBlank()">
+        <i class="bi bi-box-arrow-up-right"></i>
+        <span>Open in about:blank</span>
+      </button>
+					</div>
+				</div>
+
+				<div class="iframe-wrapper" id="iframeWrapper">
+					<iframe id="iframe"></iframe>
+				</div>
+
+				<script>
+					const messages = [
+      "go get a life",
+      "you failed your job application, is that why you're here?",
+      "go earn money",
+      "Monero de monero",
+      "frogiesarcade is ahh",
+      "luminal vibecoded",
+      "zxs why the iframe :sob:",
+      "touch grass challenge (impossible)",
+      "your resume called, it's disappointed",
+      "productivity? never heard of her",
+      "the unemployment rate thanks you for your service"
+    ];
+
+    const msgEl = document.getElementById('randomMessage');
+    msgEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+
+    function createConstellation() {
+      const container = document.getElementById('constellation');
+      const stars = 80;
+      const starPositions = [];
+
+      for (let i = 0; i < stars; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        star.style.left = x + '%';
+        star.style.top = y + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        container.appendChild(star);
+        starPositions.push({ x, y, element: star });
+      }
+
+      for (let i = 0; i < stars; i++) {
+        const star1 = starPositions[i];
+        const connections = Math.floor(Math.random() * 2) + 1;
+        
+        for (let j = 0; j < connections; j++) {
+          const nearbyStars = starPositions
+            .map((star2, idx) => ({
+              star: star2,
+              idx: idx,
+              distance: Math.sqrt(Math.pow(star1.x - star2.x, 2) + Math.pow(star1.y - star2.y, 2))
+            }))
+            .filter(s => s.idx !== i && s.distance < 20)
+            .sort((a, b) => a.distance - b.distance);
+
+          if (nearbyStars.length > 0) {
+            const star2 = nearbyStars[Math.floor(Math.random() * Math.min(3, nearbyStars.length))].star;
+            const line = document.createElement('div');
+            line.className = 'constellation-line';
+            
+            const length = Math.sqrt(
+              Math.pow((star2.x - star1.x) * window.innerWidth / 100, 2) +
+              Math.pow((star2.y - star1.y) * window.innerHeight / 100, 2)
+            );
+            const angle = Math.atan2(
+              (star2.y - star1.y) * window.innerHeight / 100,
+              (star2.x - star1.x) * window.innerWidth / 100
+            ) * 180 / Math.PI;
+            
+            line.style.width = length + 'px';
+            line.style.left = star1.x + '%';
+            line.style.top = star1.y + '%';
+            line.style.transform = `rotate(${angle}deg)`;
+            line.style.animationDelay = Math.random() * 4 + 's';
+            
+            container.appendChild(line);
+          }
+        }
+      }
+    }
+
+    createConstellation();
+
+    function openInAboutBlank() {
+      const url = window.location.href;
+      const win = window.open('about:blank', '_blank');
+      if (win) {
+        win.document.write('<iframe src="' + url + '" style="position:fixed;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;z-index:999999;"></iframe>');
+        win.document.close();
+        window.location.replace('https://google.com');
+      }
+    }
+
+    function openSettings() {
+      document.getElementById('settingsModal').classList.add('active');
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.remove('active');
+    }
+
+    document.getElementById('settingsModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeSettings();
+      }
+    });
+
+    let panicKey = localStorage.getItem('panicKey') || '';
+    let panicUrl = localStorage.getItem('panicUrl') || 'https://google.com';
+    
+    if (panicKey) {
+      document.getElementById('panicKey').value = panicKey;
+    }
+
+    document.getElementById('panicKey').addEventListener('click', function() {
+      this.value = 'Press any key...';
+      const keyListener = function(e) {
+        e.preventDefault();
+        document.getElementById('panicKey').value = e.key.toUpperCase();
+        document.removeEventListener('keydown', keyListener);
+      };
+      document.addEventListener('keydown', keyListener);
+    });
+
+    document.addEventListener('keydown', function(e) {
+      const savedPanicKey = localStorage.getItem('panicKey');
+      if (savedPanicKey && e.key.toLowerCase() === savedPanicKey.toLowerCase()) {
+        window.location.href = localStorage.getItem('panicUrl') || 'https://google.com';
+      }
+    });
+
+    function saveSettings() {
+      const wispUrl = document.getElementById('websocket').value;
+      const tabTitle = document.getElementById('tabTitle').value;
+      const panicKey = document.getElementById('panicKey').value;
+
+      if (wispUrl) {
+        localStorage.setItem('wispUrl', wispUrl);
+        setTransport('epoxy');
+      }
+
+      if (tabTitle) {
+        document.title = tabTitle;
+        localStorage.setItem('tabTitle', tabTitle);
+      }
+
+      if (panicKey && panicKey !== 'Press any key...') {
+        localStorage.setItem('panicKey', panicKey);
+      }
+
+      closeSettings();
+      
+      const saveBtn = document.querySelector('.save-btn');
+      const originalText = saveBtn.textContent;
+      saveBtn.textContent = '✓ Saved!';
+      setTimeout(() => {
+        saveBtn.textContent = originalText;
+      }, 2000);
+    }
+
+    window.addEventListener('load', function() {
+      const savedTabTitle = localStorage.getItem('tabTitle');
+      const savedWispUrl = localStorage.getItem('wispUrl');
+      const savedPanicKey = localStorage.getItem('panicKey');
+
+      if (savedTabTitle) {
+        document.title = savedTabTitle;
+        document.getElementById('tabTitle').value = savedTabTitle;
+      }
+
+      if (savedWispUrl) {
+        document.getElementById('websocket').value = savedWispUrl;
+      }
+
+      if (savedPanicKey) {
+        document.getElementById('panicKey').value = savedPanicKey;
+      }
+    });
+
+    window.loadUrl = function(url) {
+      if (typeof scramjet === 'undefined' || typeof window.search === 'undefined') {
+        setTimeout(() => loadUrl(url), 100);
+        return;
+      }
+      const fixedurl = window.search(url);
+      const src = scramjet.encodeUrl(fixedurl);
+      document.getElementById('iframe').src = src;
+      document.getElementById('iframeWrapper').classList.add('active');
+      document.getElementById('homepage').style.display = 'none';
+    }
+				</script>
+
+				<script src="https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.all.js" defer>
+				</script>
+				<script type="module" defer>
+					import * as BareMux from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux/dist/index.mjs";
+    const { ScramjetController } = $scramjetLoadController();
+    const scramjet = new ScramjetController({ 
+      files: { 
+        wasm: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/wasm.wasm", 
+        all: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.all.js", 
+        sync: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.sync.js" 
+      } 
+    });
+    try {
+      scramjet.init();
+      navigator.serviceWorker.register("/sw.js");
+    } catch (e) { console.error("scramjet failed to initialize;", e); }
+    const connection = new BareMux.BareMuxConnection("/bareworker.js");
+    function getWispUrl() {
+        const wisp = document.getElementById("websocket").value.trim();
+        const savedWisp = localStorage.getItem('wispUrl');
+        const defaultWisp = "wss://gointospace.app/wisp/";
+        return wisp || savedWisp || defaultWisp;
+    }
+    async function setTransport(transportsel) {
+      const wispUrl = getWispUrl();
+      switch (transportsel) {
+        case "epoxy":
+          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
+          break;
+        case "libcurl":
+          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/libcurl-transport/dist/index.mjs", [{ websocket: wispUrl }]);
+          break;
+        default:
+          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
+          break;
+      }
+    }
+    window.setTransport = setTransport;
+
+    window.search = function(input) {
+      let template = "https://search.brave.com/search?q=%s";
+
+      try {
+        return new URL(input).toString();
+      } catch (err) {}
+
+      try {
+        let url = new URL(`http://${input}`);
+        if (url.hostname.includes(".")) return url.toString();
+      } catch (err) {}
+
+      return template.replace("%s", input); 
+    }
+
+    setTransport("epoxy");
+    document.getElementById("search").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      let fixedurl = search(document.getElementById("url").value);
+      let src;
+      src = scramjet.encodeUrl(fixedurl);
+      document.getElementById('iframe').src = src;
+      document.getElementById('iframeWrapper').classList.add('active');
+      document.getElementById('homepage').style.display = 'none';
+    });
+  </script>
+</body>
+
+</html>
