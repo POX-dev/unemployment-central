@@ -791,7 +791,8 @@
       console.log("Service worker registered successfully");
     } catch (e) { 
       console.error("scramjet failed to initialize;", e);
-      alert("Proxy setup failed. Make sure sw.js exists on your server.");
+      console.error("Error details:", e.message, e.stack);
+      alert("Proxy setup failed: " + e.message + "\n\nMake sure sw.js exists at the root of your server.");
     }
     
     const connection = new BareMux.BareMuxConnection("/bareworker.js");
