@@ -847,16 +847,32 @@
 
     document.getElementById("search").addEventListener("submit", async (event) => {
       event.preventDefault();
-      let fixedurl = window.search(document.getElementById("url").value);
-      let src;
+      event.stopPropagation();
+      
+      const urlInput = document.getElementById("url").value;
+      if (!urlInput) return;
+      
+      let fixedurl = window.search(urlInput);
+      
       try {
-        src = scramjet.encodeUrl(fixedurl);
-        document.getElementById('iframe').src = src;
-        document.getElementById('iframeWrapper').classList.add('active');
-        document.getElementById('homepage').style.display = 'none';
+        if (typeof scramjet === 'undefined' || !scramjet.encodeUrl) {
+          console.error('Scramjet not loaded yet');
+          return;
+        }
+        
+        const src = scramjet.encodeUrl(fixedurl);
+        const iframe = document.getElementById('iframe');
+        const iframeWrapper = document.getElementById('iframeWrapper');
+        const homepage = document.getElementById('homepage');
+        
+        iframe.src = src;
+        iframeWrapper.classList.add('active');
+        homepage.style.display = 'none';
       } catch (error) {
         console.error('Failed to encode URL:', error);
       }
+      
+      return false;
     });
   </script>
 </body>
