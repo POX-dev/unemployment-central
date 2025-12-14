@@ -473,7 +473,7 @@
 		</div>
 
 		<div class="search-wrapper">
-			<form id="search" class="search-box">
+			<form id="search" class="search-box" action="javascript:void(0);">
 				<div class="search-input-wrapper">
 					<i class="bi bi-search search-icon"></i>
 					<input id="url" type="text" class="search-input" placeholder="Search or enter a site URL">
@@ -776,6 +776,7 @@
 					import * as BareMux from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux/dist/index.mjs";
     const { ScramjetController } = $scramjetLoadController();
     const scramjet = new ScramjetController({ 
+      prefix: "/scramjet/",
       files: { 
         wasm: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/wasm.wasm", 
         all: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.all.js", 
@@ -784,10 +785,13 @@
     });
     
     try {
-      scramjet.init();
-      navigator.serviceWorker.register("/sw.js");
+      await scramjet.init();
+      const registration = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.ready;
+      console.log("Service worker registered successfully");
     } catch (e) { 
-      console.error("scramjet failed to initialize;", e); 
+      console.error("scramjet failed to initialize;", e);
+      alert("Proxy setup failed. Make sure sw.js exists on your server.");
     }
     
     const connection = new BareMux.BareMuxConnection("/bareworker.js");
@@ -850,14 +854,21 @@
       event.stopPropagation();
       
       const urlInput = document.getElementById("url").value;
-      if (!urlInput) return;
+      if (!urlInput) return false;
+      
+      // Check if service worker is ready
+      if (!navigator.serviceWorker.controller) {
+        alert("Proxy not ready yet. Please wait a moment and try again.");
+        return false;
+      }
       
       let fixedurl = window.search(urlInput);
       
       try {
         if (typeof scramjet === 'undefined' || !scramjet.encodeUrl) {
           console.error('Scramjet not loaded yet');
-          return;
+          alert("Proxy not loaded. Please refresh the page.");
+          return false;
         }
         
         const src = scramjet.encodeUrl(fixedurl);
@@ -870,6 +881,7 @@
         homepage.style.display = 'none';
       } catch (error) {
         console.error('Failed to encode URL:', error);
+        alert("Failed to load site: " + error.message);
       }
       
       return false;
