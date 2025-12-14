@@ -473,7 +473,7 @@
 		</div>
 
 		<div class="search-wrapper">
-			<form id="search" class="search-box" action="javascript:void(0);">
+			<form id="search" class="search-box">
 				<div class="search-input-wrapper">
 					<i class="bi bi-search search-icon"></i>
 					<input id="url" type="text" class="search-input" placeholder="Search or enter a site URL">
@@ -554,7 +554,7 @@
 
 			<div class="setting-group">
 				<label class="setting-label">WISP Server URL</label>
-				<input id="websocket" type="text" class="setting-input" placeholder="wss://gointospace.app/wisp/">
+				<input id="websocket" type="text" class="setting-input" placeholder="wss://gointospace.app/wisp/" value="wss://gointospace.app/wisp/">
       </div>
 
 				<div class="setting-group">
@@ -748,8 +748,6 @@
 
       if (savedWispUrl) {
         document.getElementById('websocket').value = savedWispUrl;
-      } else {
-        document.getElementById('websocket').value = 'wss://gointospace.app/wisp/';
       }
 
       if (savedPanicKey) {
@@ -784,43 +782,31 @@
       } 
     });
     
-    try {
-      await scramjet.init();
-      const registration = await navigator.serviceWorker.register("/sw.js");
-      await navigator.serviceWorker.ready;
-      console.log("Service worker registered successfully");
-    } catch (e) { 
-      console.error("scramjet failed to initialize;", e);
-      console.error("Error details:", e.message, e.stack);
-      alert("Proxy setup failed: " + e.message + "\n\nMake sure sw.js exists at the root of your server.");
-    }
+    scramjet.init();
+    const swPath = window.location.pathname.split('/')[1] ? `/${window.location.pathname.split('/')[1]}/sw.js` : '/sw.js';
+    navigator.serviceWorker.register(swPath);
     
     const connection = new BareMux.BareMuxConnection("/bareworker.js");
     
     function getWispUrl() {
-      const inputVal = document.getElementById("websocket").value.trim();
-      const savedWisp = localStorage.getItem('wispUrl');
-      const defaultWisp = "wss://gointospace.app/wisp/";
-      return inputVal || savedWisp || defaultWisp;
+        const wisp = document.getElementById("websocket").value.trim();
+        const savedWisp = localStorage.getItem('wispUrl');
+        const defaultWisp = "wss://gointospace.app/wisp/";
+        return wisp || savedWisp || defaultWisp;
     }
     
     async function setTransport(transportsel) {
       const wispUrl = getWispUrl();
-      
-      try {
-        switch (transportsel) {
-          case "epoxy":
-            await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
-            break;
-          case "libcurl":
-            await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/libcurl-transport/dist/index.mjs", [{ websocket: wispUrl }]);
-            break;
-          default:
-            await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
-            break;
-        }
-      } catch (error) {
-        console.error('Failed to set transport:', error);
+      switch (transportsel) {
+        case "epoxy":
+          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
+          break;
+        case "libcurl":
+          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/libcurl-transport/dist/index.mjs", [{ websocket: wispUrl }]);
+          break;
+        default:
+          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
+          break;
       }
     }
     
@@ -841,51 +827,15 @@
       return template.replace("%s", encodeURIComponent(input)); 
     }
 
-    // Initialize transport after DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => setTransport("epoxy"), 100);
-      });
-    } else {
-      setTimeout(() => setTransport("epoxy"), 100);
-    }
-
+    setTransport("epoxy");
+    
     document.getElementById("search").addEventListener("submit", async (event) => {
       event.preventDefault();
-      event.stopPropagation();
-      
-      const urlInput = document.getElementById("url").value;
-      if (!urlInput) return false;
-      
-      // Check if service worker is ready
-      if (!navigator.serviceWorker.controller) {
-        alert("Proxy not ready yet. Please wait a moment and try again.");
-        return false;
-      }
-      
-      let fixedurl = window.search(urlInput);
-      
-      try {
-        if (typeof scramjet === 'undefined' || !scramjet.encodeUrl) {
-          console.error('Scramjet not loaded yet');
-          alert("Proxy not loaded. Please refresh the page.");
-          return false;
-        }
-        
-        const src = scramjet.encodeUrl(fixedurl);
-        const iframe = document.getElementById('iframe');
-        const iframeWrapper = document.getElementById('iframeWrapper');
-        const homepage = document.getElementById('homepage');
-        
-        iframe.src = src;
-        iframeWrapper.classList.add('active');
-        homepage.style.display = 'none';
-      } catch (error) {
-        console.error('Failed to encode URL:', error);
-        alert("Failed to load site: " + error.message);
-      }
-      
-      return false;
+      let fixedurl = search(document.getElementById("url").value);
+      let src = scramjet.encodeUrl(fixedurl);
+      document.getElementById('iframe').src = src;
+      document.getElementById('iframeWrapper').classList.add('active');
+      document.getElementById('homepage').style.display = 'none';
     });
   </script>
 </body>
