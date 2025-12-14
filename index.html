@@ -554,7 +554,7 @@
 
 			<div class="setting-group">
 				<label class="setting-label">WISP Server URL</label>
-				<input id="websocket" type="text" class="setting-input" placeholder="wss://gointospace.app/wisp/" value="wss://gointospace.app/wisp/">
+				<input id="websocket" type="text" class="setting-input" placeholder="wss://gointospace.app/wisp/">
       </div>
 
 				<div class="setting-group">
@@ -712,7 +712,9 @@
 
       if (wispUrl) {
         localStorage.setItem('wispUrl', wispUrl);
-        setTransport('epoxy');
+        if (window.setTransport) {
+          window.setTransport('epoxy');
+        }
       }
 
       if (tabTitle) {
@@ -746,6 +748,8 @@
 
       if (savedWispUrl) {
         document.getElementById('websocket').value = savedWispUrl;
+      } else {
+        document.getElementById('websocket').value = 'wss://gointospace.app/wisp/';
       }
 
       if (savedPanicKey) {
@@ -778,31 +782,43 @@
         sync: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.sync.js" 
       } 
     });
+    
     try {
       scramjet.init();
       navigator.serviceWorker.register("/sw.js");
-    } catch (e) { console.error("scramjet failed to initialize;", e); }
-    const connection = new BareMux.BareMuxConnection("/bareworker.js");
-    function getWispUrl() {
-        const wisp = document.getElementById("websocket").value.trim();
-        const savedWisp = localStorage.getItem('wispUrl');
-        const defaultWisp = "wss://gointospace.app/wisp/";
-        return wisp || savedWisp || defaultWisp;
+    } catch (e) { 
+      console.error("scramjet failed to initialize;", e); 
     }
+    
+    const connection = new BareMux.BareMuxConnection("/bareworker.js");
+    
+    function getWispUrl() {
+      const inputVal = document.getElementById("websocket").value.trim();
+      const savedWisp = localStorage.getItem('wispUrl');
+      const defaultWisp = "wss://gointospace.app/wisp/";
+      return inputVal || savedWisp || defaultWisp;
+    }
+    
     async function setTransport(transportsel) {
       const wispUrl = getWispUrl();
-      switch (transportsel) {
-        case "epoxy":
-          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
-          break;
-        case "libcurl":
-          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/libcurl-transport/dist/index.mjs", [{ websocket: wispUrl }]);
-          break;
-        default:
-          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
-          break;
+      
+      try {
+        switch (transportsel) {
+          case "epoxy":
+            await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
+            break;
+          case "libcurl":
+            await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/libcurl-transport/dist/index.mjs", [{ websocket: wispUrl }]);
+            break;
+          default:
+            await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
+            break;
+        }
+      } catch (error) {
+        console.error('Failed to set transport:', error);
       }
     }
+    
     window.setTransport = setTransport;
 
     window.search = function(input) {
@@ -817,18 +833,30 @@
         if (url.hostname.includes(".")) return url.toString();
       } catch (err) {}
 
-      return template.replace("%s", input); 
+      return template.replace("%s", encodeURIComponent(input)); 
     }
 
-    setTransport("epoxy");
+    // Initialize transport after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => setTransport("epoxy"), 100);
+      });
+    } else {
+      setTimeout(() => setTransport("epoxy"), 100);
+    }
+
     document.getElementById("search").addEventListener("submit", async (event) => {
       event.preventDefault();
-      let fixedurl = search(document.getElementById("url").value);
+      let fixedurl = window.search(document.getElementById("url").value);
       let src;
-      src = scramjet.encodeUrl(fixedurl);
-      document.getElementById('iframe').src = src;
-      document.getElementById('iframeWrapper').classList.add('active');
-      document.getElementById('homepage').style.display = 'none';
+      try {
+        src = scramjet.encodeUrl(fixedurl);
+        document.getElementById('iframe').src = src;
+        document.getElementById('iframeWrapper').classList.add('active');
+        document.getElementById('homepage').style.display = 'none';
+      } catch (error) {
+        console.error('Failed to encode URL:', error);
+      }
     });
   </script>
 </body>
