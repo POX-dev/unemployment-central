@@ -128,77 +128,9 @@
 					<iframe id="iframe"></iframe>
 				</div>
 
-				<script src="main.js"></script>
-				<script src="scramjet/scramjet.all.js" defer>
-				</script>
-				<script type="module" defer>
-					import * as BareMux from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux/dist/index.mjs";
-    const { ScramjetController } = $scramjetLoadController();
-    const scramjet = new ScramjetController({ 
-      prefix: "/scramjet/",
-      files: { 
-        wasm: "scramjet/wasm.wasm", 
-        all: "scramjet/scramjet.all.js", 
-        sync: "scramjet/scramjet.sync.js" 
-      } 
-    });
-    
-    scramjet.init();
-    const swPath = window.location.pathname.split('/')[1] ? `/${window.location.pathname.split('/')[1]}/sw.js` : '/sw.js';
-    navigator.serviceWorker.register(swPath);
-    
-    const connection = new BareMux.BareMuxConnection("/bareworker.js");
-    
-    function getWispUrl() {
-        const wisp = document.getElementById("websocket").value.trim();
-        const savedWisp = localStorage.getItem('wispUrl');
-        const defaultWisp = "wss://gointospace.app/wisp/";
-        return wisp || savedWisp || defaultWisp;
-    }
-    
-    async function setTransport(transportsel) {
-      const wispUrl = getWispUrl();
-      switch (transportsel) {
-        case "epoxy":
-          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
-          break;
-        case "libcurl":
-          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/libcurl-transport/dist/index.mjs", [{ websocket: wispUrl }]);
-          break;
-        default:
-          await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs", [{ wisp: wispUrl }]);
-          break;
-      }
-    }
-    
-    window.setTransport = setTransport;
-
-    window.search = function(input) {
-      let template = "https://search.brave.com/search?q=%s";
-
-      try {
-        return new URL(input).toString();
-      } catch (err) {}
-
-      try {
-        let url = new URL(`http://${input}`);
-        if (url.hostname.includes(".")) return url.toString();
-      } catch (err) {}
-
-      return template.replace("%s", encodeURIComponent(input)); 
-    }
-
-    setTransport("epoxy");
-    
-    document.getElementById("search").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      let fixedurl = search(document.getElementById("url").value);
-      let src = scramjet.encodeUrl(fixedurl);
-      document.getElementById('iframe').src = src;
-      document.getElementById('iframeWrapper').classList.add('active');
-      document.getElementById('homepage').style.display = 'none';
-    });
-  </script>
+				<script src="main.js" defer></script>
+				<script src="scramjet/scramjet.all.js" defer></script>
+				<script src="index.js" defer></script>
 </body>
 
 </html>
